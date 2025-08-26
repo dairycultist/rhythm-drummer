@@ -1,12 +1,30 @@
+static Texture *note_red;
+static Texture *note_blue;
+static Texture *drum;
+
 void logic_init() {
 
-    // Texture *tex = load_texture("reference_also_remember_hit_has_fade_out_pulse_effect.png");
+    note_red = load_texture("note_red.png");
+    note_blue = load_texture("note_blue.png");
+    drum = load_texture("drum.png");
 }
 
 void logic_process(unsigned long time) {
 
-    // draw_texture(tex, 0, 0);
-    draw_rect(255, 0, 0, 40, 40 + (time % 100), 20, 10);
+    float beat = time * 0.05;
+    float beat_dec = beat - (int) beat;
+
+    for (int i=0; i<4; i++) {
+
+        int c = (int) ((beat_dec + i) * 20);
+
+        draw_rect(c, c, c, 0, (int) (beat_dec * 100 + i * 100), 128, 3);
+    }
+
+    draw_texture(drum, 0, 400);
+
+    draw_texture(note_red, 0, (int) (beat * 100));
+    draw_texture(note_blue, 0, (int) (beat * 100));
 }
 
 void logic_resize_window(int w, int h) {
@@ -15,8 +33,11 @@ void logic_resize_window(int w, int h) {
 
 void logic_keychange(int scancode, int is_pressed) {
 
+    // if (scancode == SDL_SCANCODE_Z && is_pressed) {
+
+    // }
 }
 
 void logic_exit() {
-    
+
 }

@@ -72,6 +72,7 @@ int main() {
 
 	// init game logic
 	logic_init();
+	logic_resize_window(400, 600);
 
 	// process events until window is closed
 	SDL_Event event;
@@ -92,7 +93,7 @@ int main() {
 
 			} else if ((event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) && !event.key.repeat) {
 
-				logic_keychange(event.key.keysym.scancode, event.key.state == SDL_PRESSED); // SDL_SCANCODE_Z
+				logic_keychange(event.key.keysym.scancode, event.key.state == SDL_PRESSED);
 			}
 		}
 
