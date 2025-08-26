@@ -26,7 +26,7 @@ void draw_texture(Texture *tex, int x, int y) {
 	SDL_RenderCopy(renderer, tex->sdl_texture, NULL, &texture_rect);
 }
 
-void free_texture(Texture *tex) {
+void destroy_texture(Texture *tex) {
 	
 	SDL_DestroyTexture(tex->sdl_texture);
 	free(tex);
@@ -57,6 +57,7 @@ void window_init() {
 }
 
 void window_exit() {
+	
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 }

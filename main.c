@@ -19,13 +19,9 @@ int main() {
 		return 1;
 	}
 
-	// init window
+	// init everything else
 	window_init();
-
-	// init audio
 	audio_init();
-
-	// init game logic
 	logic_init();
 	logic_resize_window(400, 600);
 

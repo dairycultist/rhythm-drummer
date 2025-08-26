@@ -7,29 +7,32 @@ typedef struct {
 } Audio;
 
 static char dummy[256];
-static Audio *current_audio;
+static Audio *active_audio[8] = {0};
 
-void audio_callback(void *userdata, Uint8 *stream, int requested_len) {
+static void audio_callback(void *userdata, Uint8 *stream, int requested_len) {
 	
 	Uint8 data[2048] = {0};
 
-	if (current_audio) {
+	for (int i=0; i<8; i++) {
 
-		// mix requested data (up to as much as is available) into data buffer
-		int retrieved_len = current_audio->length - current_audio->position;
-		
-		if (requested_len < retrieved_len)
-			retrieved_len = requested_len;
+		if (active_audio[i]) {
 
-		for (int i=0; i<retrieved_len; i++) {
-			data[i] += (current_audio->data + current_audio->position)[i];
-		}
-		
-		current_audio->position += retrieved_len;
+			// mix requested data (up to as much as is available) into data buffer
+			int retrieved_len = active_audio[i]->length - active_audio[i]->position;
+			
+			if (requested_len < retrieved_len)
+				retrieved_len = requested_len;
 
-		// if there is no more data left for this audio, remove it from future callbacks
-		if (current_audio->position == current_audio->length) {
-			current_audio = NULL;
+			for (int j=0; j<retrieved_len; j++) {
+				data[j] += (active_audio[i]->data + active_audio[i]->position)[j];
+			}
+			
+			active_audio[i]->position += retrieved_len;
+
+			// if there is no more data left for this audio, remove it from future callbacks
+			if (active_audio[i]->position == active_audio[i]->length) {
+				active_audio[i] = NULL;
+			}
 		}
 	}
 
@@ -58,7 +61,15 @@ void destroy_audio(Audio *audio) {
 void play_audio(Audio *audio) {
 
 	audio->position = 0;
-	current_audio = audio;
+	
+	for (int i=0; i<8; i++) {
+
+		if (!active_audio[i]) {
+
+			active_audio[i] = audio;
+			return;
+		}
+	}
 }
 
 void audio_init() {
@@ -84,5 +95,6 @@ void audio_init() {
 }
 
 void audio_exit() {
+
 	SDL_CloseAudio();
 }

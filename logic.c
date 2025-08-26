@@ -3,6 +3,7 @@ static Texture *note_blue;
 static Texture *drum;
 
 static Audio *rim;
+static Audio *snare;
 
 void logic_init() {
 
@@ -11,6 +12,7 @@ void logic_init() {
     drum = load_texture("drum.png");
 
     rim = create_audio("rim.wav");
+    snare = create_audio("snare.wav");
 }
 
 void logic_process(unsigned long time) {
@@ -40,9 +42,17 @@ void logic_keychange(int scancode, int is_pressed) {
     if (scancode == SDL_SCANCODE_Z && is_pressed) {
         play_audio(rim);
     }
+
+    if (scancode == SDL_SCANCODE_X && is_pressed) {
+        play_audio(snare);
+    }
 }
 
 void logic_exit() {
 
-    // destroy_audio(rim);
+    destroy_texture(note_red);
+    destroy_texture(note_blue);
+    destroy_texture(drum);
+
+    destroy_audio(rim);
 }
