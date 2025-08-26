@@ -4,7 +4,7 @@ typedef struct {
 
     Uint32 length;
 	Uint32 position;
-	Uint8 *data; // SDL_FreeWAV(data);
+	Uint8 *data;
 
 } Audio;
 
@@ -13,19 +13,23 @@ static Audio *current_audio;
 
 void audio_callback(void *userdata, Uint8 *stream, int requested_len) {
 	
-	Uint8 data[16384 * 4] = {0};
+	Uint8 data[16384] = {0};
 
 	if (current_audio) {
 
+		// mix requested data (up to as much as is available) into data buffer
 		int retrieved_len = current_audio->length - current_audio->position;
 		
 		if (requested_len < retrieved_len)
 			retrieved_len = requested_len;
 
-		memcpy(data, current_audio->data + current_audio->position, retrieved_len);
+		for (int i=0; i<retrieved_len; i++) {
+			data[i] += (current_audio->data + current_audio->position)[i];
+		}
 		
 		current_audio->position += retrieved_len;
 
+		// if there is no more data left for this audio, remove it from future callbacks
 		if (current_audio->position == current_audio->length) {
 			current_audio = NULL;
 		}
@@ -54,7 +58,7 @@ void init_audio(const char *path) { // needs to take an example file to determin
 	SDL_PauseAudio(0);
 }
 
-void play_audio(const char *path) {
+Audio *create_audio(const char *path) {
 
 	Audio *audio = malloc(sizeof(Audio));
 
@@ -63,8 +67,18 @@ void play_audio(const char *path) {
 		exit(-1);
 	}
 
-	audio->position = 0;
+	return audio;
+}
 
+void destroy_audio(Audio *audio) {
+
+	SDL_FreeWAV(audio->data);
+	free(audio);
+}
+
+void play_audio(Audio *audio) {
+
+	audio->position = 0;
 	current_audio = audio;
 }
 
@@ -75,8 +89,10 @@ int main(int argc, char* argv[]) {
 		return 1;
 
 	init_audio("rim.wav");
-	play_audio("rim.wav");
+	Audio *rim = create_audio("rim.wav");
+	play_audio(rim);
 
 	SDL_Delay(3000);
+	destroy_audio(rim);
 	SDL_CloseAudio();
 }
