@@ -3,7 +3,6 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-// #include "logic.c"
 
 #define TRUE 1
 #define FALSE 0
@@ -49,6 +48,8 @@ void draw_rect(int r, int g, int b, int x, int y, int w, int h) {
 	SDL_RenderFillRect(renderer, &rect);
 }
 
+#include "logic.c"
+
 int main() {
 
 	printf("Starting Rhythm Drummer\n");
@@ -72,8 +73,8 @@ int main() {
 		return 1;
 	}
 
-	// init game stuff
-	Texture *tex = load_texture("reference_also_remember_hit_has_fade_out_pulse_effect.png");
+	// init game logic
+	logic_init();
 
 	// process events until window is closed
 	SDL_Event event;
@@ -90,12 +91,11 @@ int main() {
 
 			} else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) {
 
-				// event.window.data1
-				// event.window.data2
+				logic_resize_window(event.window.data1, event.window.data2);
 
 			} else if ((event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) && !event.key.repeat) {
 
-				// if (event.key.keysym.scancode == SDL_SCANCODE_Z)
+				logic_keychange(event.key.keysym.scancode, event.key.state == SDL_PRESSED); // SDL_SCANCODE_Z
 			}
 		}
 
@@ -104,9 +104,7 @@ int main() {
 		SDL_RenderClear(renderer);
 
 		// logic/rendering
-		time++;
-		draw_texture(tex, 0, 0);
-		draw_rect(255, 0, 0, 40, 40, 20, 10);
+		logic_process(time++);
 
 		// present rendered content to screen
 		SDL_RenderPresent(renderer);
