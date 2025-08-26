@@ -1,5 +1,3 @@
-#include <SDL2/SDL.h>
-
 typedef struct {
 
     Uint32 length;
@@ -61,4 +59,30 @@ void play_audio(Audio *audio) {
 
 	audio->position = 0;
 	current_audio = audio;
+}
+
+void audio_init() {
+
+	SDL_AudioSpec wav_spec;
+
+	if(SDL_LoadWAV("rim.wav", &wav_spec, (Uint8 **) dummy, (Uint32 *) dummy) == NULL) { // needs to take an example file to determine audio format
+		printf("Couldn't load audio: %s\n", SDL_GetError());
+		exit(-1);
+	}
+
+	wav_spec.samples = 512; // lower samples = lower latency, more frequent audio callbacks with lesser requested length
+
+	wav_spec.callback = audio_callback;
+	wav_spec.userdata = NULL;
+	
+	if (SDL_OpenAudio(&wav_spec, NULL) < 0) {
+		printf("Couldn't open audio: %s\n", SDL_GetError());
+		exit(-1);
+	}
+	
+	SDL_PauseAudio(0); // begin audio playback
+}
+
+void audio_exit() {
+	SDL_CloseAudio();
 }

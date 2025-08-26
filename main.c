@@ -5,46 +5,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-typedef struct {
-
-    void *sdl_texture;
-    int w;
-    int h;
-
-} Texture;
-
-static SDL_Renderer *renderer;
-
-Texture *load_texture(const char *path) {
-
-	Texture *tex = malloc(sizeof(Texture));
-
-	tex->sdl_texture = IMG_LoadTexture(renderer, path);
-
-	SDL_QueryTexture(tex->sdl_texture, NULL, NULL, &tex->w, &tex->h);
-
-	return tex;
-}
-
-void draw_texture(Texture *tex, int x, int y) {
-
-	SDL_Rect texture_rect = { x, y, tex->w, tex->h };
-	SDL_RenderCopy(renderer, tex->sdl_texture, NULL, &texture_rect);
-}
-
-void free_texture(Texture *tex) {
-	
-	SDL_DestroyTexture(tex->sdl_texture);
-	free(tex);
-}
-
-void draw_rect(int r, int g, int b, int x, int y, int w, int h) {
-
-	SDL_SetRenderDrawColor(renderer, r, g, b, 255);
-	SDL_Rect rect = { x, y, w, h };
-	SDL_RenderFillRect(renderer, &rect);
-}
-
+#include "window.c"
 #include "audio.c"
 #include "logic.c"
 
@@ -59,39 +20,10 @@ int main() {
 	}
 
 	// init window
-	SDL_Window *window = SDL_CreateWindow("Rhythm Drummer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 400, 660, SDL_WINDOW_RESIZABLE);
-
-	if (!window) {
-		printf("Error creating window:\n%s\n", SDL_GetError());
-		return 1;
-    }
-
-	renderer = SDL_CreateRenderer(window, -1, 0);
-
-	if (!renderer) {
-		printf("Error creating renderer:\n%s\n", SDL_GetError());
-		return 1;
-	}
+	window_init();
 
 	// init audio
-	SDL_AudioSpec wav_spec;
-
-	if(SDL_LoadWAV("rim.wav", &wav_spec, (Uint8 **) dummy, (Uint32 *) dummy) == NULL) { // needs to take an example file to determine audio format
-		printf("Couldn't load audio: %s\n", SDL_GetError());
-		exit(-1);
-	}
-
-	wav_spec.samples = 512; // lower samples = lower latency, more frequent audio callbacks with lesser requested length
-
-	wav_spec.callback = audio_callback;
-	wav_spec.userdata = NULL;
-	
-	if (SDL_OpenAudio(&wav_spec, NULL) < 0) {
-		printf("Couldn't open audio: %s\n", SDL_GetError());
-		exit(-1);
-	}
-	
-	SDL_PauseAudio(0); // begin audio playback
+	audio_init();
 
 	// init game logic
 	logic_init();
@@ -134,9 +66,8 @@ int main() {
 	}
 
 	logic_exit();
-	SDL_CloseAudio();
-	SDL_DestroyRenderer(renderer);
-	SDL_DestroyWindow(window);
+	audio_exit();
+	window_exit();
 	SDL_Quit();
 
 	return 0;
