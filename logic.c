@@ -23,8 +23,8 @@ void logic_process(unsigned long time) {
 
     draw_texture(drum, 0, 400);
 
-    draw_texture(note_red, 0, (int) (beat * 100));
     draw_texture(note_blue, 0, (int) (beat * 100));
+    draw_texture(note_red, 0, (int) (beat * 100));
 }
 
 void logic_resize_window(int w, int h) {
