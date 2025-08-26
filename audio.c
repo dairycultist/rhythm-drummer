@@ -13,7 +13,7 @@ static Audio *current_audio;
 
 void audio_callback(void *userdata, Uint8 *stream, int requested_len) {
 	
-	Uint8 data[16384] = {0};
+	Uint8 data[2048] = {0};
 
 	if (current_audio) {
 

@@ -11,7 +11,6 @@ void logic_init() {
     drum = load_texture("drum.png");
 
     rim = create_audio("rim.wav");
-    play_audio(rim);
 }
 
 void logic_process(unsigned long time) {
@@ -38,9 +37,9 @@ void logic_resize_window(int w, int h) {
 
 void logic_keychange(int scancode, int is_pressed) {
 
-    // if (scancode == SDL_SCANCODE_Z && is_pressed) {
-
-    // }
+    if (scancode == SDL_SCANCODE_Z && is_pressed) {
+        play_audio(rim);
+    }
 }
 
 void logic_exit() {

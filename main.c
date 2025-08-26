@@ -81,6 +81,8 @@ int main() {
 		exit(-1);
 	}
 
+	wav_spec.samples = 512; // lower samples = lower latency, more frequent audio callbacks with lesser requested length
+
 	wav_spec.callback = audio_callback;
 	wav_spec.userdata = NULL;
 	
