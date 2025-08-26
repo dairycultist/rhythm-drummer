@@ -2,11 +2,16 @@ static Texture *note_red;
 static Texture *note_blue;
 static Texture *drum;
 
+static Audio *rim;
+
 void logic_init() {
 
     note_red = load_texture("note_red.png");
     note_blue = load_texture("note_blue.png");
     drum = load_texture("drum.png");
+
+    rim = create_audio("rim.wav");
+    play_audio(rim);
 }
 
 void logic_process(unsigned long time) {
@@ -40,4 +45,5 @@ void logic_keychange(int scancode, int is_pressed) {
 
 void logic_exit() {
 
+    // destroy_audio(rim);
 }

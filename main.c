@@ -45,17 +45,20 @@ void draw_rect(int r, int g, int b, int x, int y, int w, int h) {
 	SDL_RenderFillRect(renderer, &rect);
 }
 
+#include "audio.c"
 #include "logic.c"
 
 int main() {
 
 	printf("Starting Rhythm Drummer\n");
 
+	// init SDL
 	if (SDL_Init(SDL_INIT_VIDEO) != 0 || SDL_Init(SDL_INIT_AUDIO) != 0) {
 		printf("Error initializing SDL:\n%s\n", SDL_GetError());
 		return 1;
 	}
 
+	// init window
 	SDL_Window *window = SDL_CreateWindow("Rhythm Drummer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 400, 660, SDL_WINDOW_RESIZABLE);
 
 	if (!window) {
@@ -69,6 +72,24 @@ int main() {
 		printf("Error creating renderer:\n%s\n", SDL_GetError());
 		return 1;
 	}
+
+	// init audio
+	SDL_AudioSpec wav_spec;
+
+	if(SDL_LoadWAV("rim.wav", &wav_spec, (Uint8 **) dummy, (Uint32 *) dummy) == NULL) { // needs to take an example file to determine audio format
+		printf("Couldn't load audio: %s\n", SDL_GetError());
+		exit(-1);
+	}
+
+	wav_spec.callback = audio_callback;
+	wav_spec.userdata = NULL;
+	
+	if (SDL_OpenAudio(&wav_spec, NULL) < 0) {
+		printf("Couldn't open audio: %s\n", SDL_GetError());
+		exit(-1);
+	}
+	
+	SDL_PauseAudio(0); // begin audio playback
 
 	// init game logic
 	logic_init();
@@ -111,6 +132,7 @@ int main() {
 	}
 
 	logic_exit();
+	SDL_CloseAudio();
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
